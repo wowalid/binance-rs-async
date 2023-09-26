@@ -15,10 +15,10 @@ use crate::util::{build_request_p, build_signed_request_p};
 
 #[derive(Clone)]
 pub struct Client {
-    api_key: String,
-    secret_key: String,
-    inner: reqwest::Client,
-    host: String,
+    pub api_key: String,
+    pub secret_key: String,
+    pub inner: reqwest::Client,
+    pub host: String,
 }
 
 impl Client {
