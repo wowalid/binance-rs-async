@@ -270,6 +270,13 @@ pub struct TransactionId {
     pub tran_id: u64,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct WithdrawId {
+    pub id: String,
+}
+
+
 /// Response to a test order (endpoint /api/v3/order/test).
 ///
 /// Currently, the API responds {} on a successfull test transaction,

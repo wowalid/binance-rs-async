@@ -136,7 +136,7 @@ impl Wallet {
     /// let records = tokio_test::block_on(wallet.withdraw(query));
     /// assert!(records.is_ok(), "{:?}", records);
     /// ```
-    pub async fn withdraw(&self, query: CoinWithdrawalQuery) -> Result<()> {
+    pub async fn withdraw(&self, query: CoinWithdrawalQuery) -> Result<WithdrawId> {
         self.client
             .post_signed_p(SAPI_V1_CAPITAL_WITHDRAW_APPLY, Some(query), self.recv_window)
             .await
