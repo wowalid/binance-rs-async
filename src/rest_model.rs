@@ -1692,6 +1692,25 @@ pub struct UniversalTransfer {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct DepositSubAccount {
+    pub to_email: String,
+    pub asset: String,
+    pub amount: f64
+}
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct WithdrawSubAccount {
+    pub from_email: String,
+    pub asset: String,
+    pub amount: f64
+}
+
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UniversalTransferHistoryQuery {
     #[serde(rename(serialize = "type", deserialize = "type"))]
     pub transfer_type: UniversalTransferType,
