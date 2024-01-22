@@ -2,7 +2,7 @@ use crate::client::*;
 use crate::errors::*;
 use crate::rest_model::*;
 use crate::util::*;
-
+static SAPI_V1_COINS_INFO_ACCOUNT: &str = "/sapi/v1/capital/config/getall";
 static API_V3_ACCOUNT: &str = "/api/v3/account";
 static API_V3_OPEN_ORDERS: &str = "/api/v3/openOrders";
 static API_V3_ALL_ORDERS: &str = "/api/v3/allOrders";
@@ -145,11 +145,24 @@ impl Account {
     /// let account = tokio_test::block_on(account.get_account());
     /// assert!(account.is_ok(), "{:?}", account);
     /// ```
+    /// 
+    /// 
+    /// 
+    /// 
+    /// 
     pub async fn get_account(&self) -> Result<AccountInformation> {
         // TODO: should parameters be Option<>?
         let request = build_signed_request([("", "")], self.recv_window)?;
         self.client.get_signed(API_V3_ACCOUNT, &request).await
     }
+
+    pub async fn get_deposit_withdraw_infos(&self) -> Result<serde_json::Value> {
+        // TODO: should parameters be Option<>?
+        let request = build_signed_request([("", "")], self.recv_window)?;
+        self.client.get_signed(SAPI_V1_COINS_INFO_ACCOUNT, &request).await
+    }
+
+
 
     /// Account balance for a single asset
     /// # Examples
