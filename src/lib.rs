@@ -78,17 +78,13 @@ pub mod util;
 pub mod account;
 pub mod api;
 pub mod config;
-#[cfg(feature = "futures_api")]
 pub mod futures;
 pub mod general;
-#[cfg(feature = "margin_api")]
 pub mod margin;
 pub mod market;
 pub mod rest_model;
-#[cfg(feature = "savings_api")]
 pub mod savings;
 pub mod userstream;
-#[cfg(feature = "wallet_api")]
 pub mod wallet;
 pub mod websockets;
 pub mod ws_model;
