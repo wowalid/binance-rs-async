@@ -7,8 +7,7 @@ use std::collections::HashMap;
 use std::ops::Sub;
 
 
-static SAPI_V1_SUBACCOUNT_WITHDRAW: &str = "/sapi/v1/managed-subaccount/withdraw";
-static SAPI_V1_SUBACCOUNT_DEPOSIT: &str = "/sapi/v1/managed-subaccount/deposit";
+static SAPI_V1_UNIVERSAL_TRANSFER: &str = "/sapi/v1/sub-account/universalTransfer";
 static SAPI_V1_SYSTEM_STATUS: &str = "/sapi/v1/system/status";
 static SAPI_V1_CAPITAL_CONFIG_GETALL: &str = "/sapi/v1/capital/config/getall";
 static SAPI_V1_ACCOUNTSNAPSHOT: &str = "/sapi/v1/accountSnapshot";
@@ -321,21 +320,27 @@ impl Wallet {
     }
 
 
-    pub async fn withdraw_subaccount(
+    pub async fn universal_transfer_subaccount(
         &self,
         asset: String,
         amount: f64,
-        from_email: String
+        from_email: String,
+        to_email : String,
+        from_account_type : String,
+        to_account_type : String
     ) -> Result<serde_json::Value> {
-        let withdraw_payload = WithdrawSubAccount {
+        let withdraw_payload = UniversalTransferSubAccount {
             asset,
             amount,
-            from_email
+            from_email,
+            to_email,
+            from_account_type,
+            to_account_type,
         };
 
         
         let response = match self.client
-            .post_signed_p(SAPI_V1_SUBACCOUNT_WITHDRAW, withdraw_payload, self.recv_window)
+            .post_signed_p(SAPI_V1_UNIVERSAL_TRANSFER, withdraw_payload, self.recv_window)
             .await {
                 Ok(res) => Ok(res),
                 Err(e) => {
@@ -349,22 +354,6 @@ impl Wallet {
         response
     }
 
-
-    pub async fn deposit_subaccount(
-        &self,
-        asset: String,
-        amount: f64,
-        to_email : String
-    ) -> Result<TransactionId> {
-        let deposit_payload = DepositSubAccount {
-            asset,
-            amount,
-            to_email
-        };
-        self.client
-            .post_signed_p(SAPI_V1_SUBACCOUNT_DEPOSIT, deposit_payload, self.recv_window)
-            .await
-    }
 
     /// Universal Transfer
     ///

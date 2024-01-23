@@ -1708,8 +1708,11 @@ pub struct DepositSubAccount {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct WithdrawSubAccount {
+pub struct UniversalTransferSubAccount {
     pub from_email: String,
+    pub to_email: String,
+    pub from_account_type : String,
+    pub to_account_type : String,
     pub asset: String,
     pub amount: f64
 }
