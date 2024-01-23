@@ -334,9 +334,19 @@ impl Wallet {
         };
 
         
-        self.client
+        let response = match self.client
             .post_signed_p(SAPI_V1_SUBACCOUNT_WITHDRAW, withdraw_payload, self.recv_window)
-            .await
+            .await {
+                Ok(res) => Ok(res),
+                Err(e) => {
+                    println!("Error: {:?}", e);
+                    Err(e)
+                }
+        };
+
+        println!("Response: {:?}", response);
+
+        response
     }
 
 
