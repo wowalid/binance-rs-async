@@ -326,7 +326,7 @@ impl Wallet {
         asset: String,
         amount: f64,
         from_email: String
-    ) -> Result<TransactionId> {
+    ) -> Result<serde_json::Value> {
         let withdraw_payload = WithdrawSubAccount {
             asset,
             amount,
@@ -334,13 +334,13 @@ impl Wallet {
         };
 
         
-        let response = match self.client
+        let response : serde_json::Value = match self.client
             .post_signed_p(SAPI_V1_SUBACCOUNT_WITHDRAW, withdraw_payload, self.recv_window)
             .await {
                 Ok(res) => Ok(res),
                 Err(e) => {
                     println!("Error: {:?}", e);
-                    Err(e)
+
                 }
         };
 
