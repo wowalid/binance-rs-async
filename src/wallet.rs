@@ -29,6 +29,7 @@ static SAPI_V1_ASSET_TRADEFEE_US: &str = "/sapi/v1/asset/query/trading-fee";
 static SAPI_V1_ASSET_TRANSFER: &str = "/sapi/v1/asset/transfer";
 static SAPI_V1_ASSET_GETFUNDINGASSET: &str = "/sapi/v1/asset/get-funding-asset";
 static SAPI_V1_ASSET_APIRESTRICTIONS: &str = "/sapi/v1/account/apiRestrictions";
+static SAPI_V1_ASSET_ONGOING_ORDERS: &str = "/sapi/v1/loan/ongoing/orders";
 static DEFAULT_WALLET_HISTORY_QUERY_INTERVAL_DAYS: i64 = 90;
 
 /// This struct acts as a gateway for all wallet endpoints.
@@ -138,6 +139,12 @@ impl Wallet {
     pub async fn withdraw(&self, query: CoinWithdrawalQuery) -> Result<WithdrawId> {
         self.client
             .post_signed_p(SAPI_V1_CAPITAL_WITHDRAW_APPLY, Some(query), self.recv_window)
+            .await
+    }
+
+    pub async fn get_loans(&self) -> Result<serde_json::Value> {
+        self.client
+            .get_signed_p(SAPI_V1_ASSET_ONGOING_ORDERS, Option::<String>::None, self.recv_window)
             .await
     }
 
@@ -286,6 +293,9 @@ impl Wallet {
             .get_signed_p(SAPI_V1_CAPITAL_DEPOSIT_ADDRESS, Some(query), self.recv_window)
             .await
     }
+
+
+
 
     /// Universal Transfer
     ///
