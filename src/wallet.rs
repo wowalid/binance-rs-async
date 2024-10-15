@@ -6,7 +6,6 @@ use chrono::{Duration, Utc};
 use std::collections::HashMap;
 use std::ops::Sub;
 
-
 static SAPI_V1_UNIVERSAL_TRANSFER: &str = "/sapi/v1/sub-account/universalTransfer";
 static SAPI_V1_SYSTEM_STATUS: &str = "/sapi/v1/system/status";
 static SAPI_V1_CAPITAL_CONFIG_GETALL: &str = "/sapi/v1/capital/config/getall";
@@ -50,7 +49,9 @@ impl Wallet {
     /// let system_status = tokio_test::block_on(wallet.system_status());
     /// assert!(system_status.is_ok(), "{:?}", system_status);
     /// ```
-    pub async fn system_status(&self) -> Result<SystemStatus> { self.client.get_p(SAPI_V1_SYSTEM_STATUS, None).await }
+    pub async fn system_status(&self) -> Result<SystemStatus> {
+        self.client.get_p(SAPI_V1_SYSTEM_STATUS, None).await
+    }
 
     /// Get information of coins (available for deposit and withdraw) for user.
     /// # Examples
@@ -94,9 +95,9 @@ impl Wallet {
     /// let records = tokio_test::block_on(wallet.disable_fast_withdraw_switch());
     /// assert!(records.is_ok(), "{:?}", records);
     /// ```
-    /// 
-    /// 
-    /// 
+    ///
+    ///
+    ///
     pub async fn disable_fast_withdraw_switch(&self) -> Result<()> {
         self.client
             .post_signed_p(
@@ -294,9 +295,6 @@ impl Wallet {
             .await
     }
 
-
-
-
     /// Universal Transfer
     ///
     /// from_symbol must be sent when transfer_type are IsolatedmarginMargin and IsolatedmarginIsolatedmargin
@@ -329,15 +327,14 @@ impl Wallet {
             .await
     }
 
-
     pub async fn universal_transfer_subaccount(
         &self,
         asset: String,
         amount: f64,
         from_email: String,
-        to_email : String,
-        from_account_type : String,
-        to_account_type : String
+        to_email: String,
+        from_account_type: String,
+        to_account_type: String,
     ) -> Result<serde_json::Value> {
         let withdraw_payload = UniversalTransferSubAccount {
             asset,
@@ -348,22 +345,22 @@ impl Wallet {
             to_account_type,
         };
 
-        
-        let response = match self.client
+        let response = match self
+            .client
             .post_signed_p(SAPI_V1_UNIVERSAL_TRANSFER, withdraw_payload, self.recv_window)
-            .await {
-                Ok(res) => Ok(res),
-                Err(e) => {
-                    println!("Error: {:?}", e);
-                    Err(e)
-                }
+            .await
+        {
+            Ok(res) => Ok(res),
+            Err(e) => {
+                println!("Error: {:?}", e);
+                Err(e)
+            }
         };
 
         println!("Response: {:?}", response);
 
         response
     }
-
 
     /// Universal Transfer
     ///

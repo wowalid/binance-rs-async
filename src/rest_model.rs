@@ -276,7 +276,6 @@ pub struct WithdrawId {
     pub id: String,
 }
 
-
 /// Response to a test order (endpoint /api/v3/order/test).
 ///
 /// Currently, the API responds {} on a successfull test transaction,
@@ -1639,6 +1638,33 @@ pub struct DepositAddress {
     pub url: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct FeeInformation {
+    pub symbol: String,
+    pub standard_commission: Commission,
+    pub tax_commission: Commission,
+    pub discount: Discount,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Commission {
+    pub maker: String,
+    pub taker: String,
+    pub buyer: String,
+    pub seller: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct Discount {
+    pub enabled_for_account: bool,
+    pub enabled_for_symbol: bool,
+    pub discount_asset: String,
+    pub discount: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum UniversalTransferType {
@@ -1702,22 +1728,19 @@ pub struct UniversalTransfer {
 pub struct DepositSubAccount {
     pub to_email: String,
     pub asset: String,
-    pub amount: f64
+    pub amount: f64,
 }
-
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UniversalTransferSubAccount {
     pub from_email: String,
     pub to_email: String,
-    pub from_account_type : String,
-    pub to_account_type : String,
+    pub from_account_type: String,
+    pub to_account_type: String,
     pub asset: String,
-    pub amount: f64
+    pub amount: f64,
 }
-
-
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
