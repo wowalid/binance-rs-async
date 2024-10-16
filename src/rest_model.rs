@@ -1616,7 +1616,7 @@ pub struct WithdrawalRecord {
     /// // confirm times for withdraw
     pub confirm_no: Option<u64>,
     pub info: Option<String>,
-    pub tx_id: String,
+    pub tx_id: Option<String>,
 }
 
 #[cfg(feature = "wallet_api")]
