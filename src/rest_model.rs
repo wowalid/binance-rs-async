@@ -1536,6 +1536,39 @@ pub struct CoinWithdrawalQuery {
     pub wallet_type: u8,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoanResponse {
+    rows: Vec<LoanInfo>,
+    total: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoanInfo {
+    #[serde(rename = "orderId")]
+    pub order_id: u64,
+    #[serde(rename = "loanCoin")]
+    pub loan_coin: String,
+    #[serde(rename = "totalDebt")]
+    pub total_debt: String,
+    #[serde(rename = "residualInterest")]
+    pub residual_interest: String,
+    #[serde(rename = "collateralAccountId")]
+    pub collateral_account_id: String,
+    #[serde(rename = "collateralCoin")]
+    pub collateral_coin: String,
+    #[serde(rename = "totalCollateralValueAfterHaircut")]
+    pub total_collateral_value_after_haircut: String,
+    #[serde(rename = "lockedCollateralValue")]
+    pub locked_collateral_value: String,
+    #[serde(rename = "currentLTV")]
+    pub current_ltv: String,
+    #[serde(rename = "expirationTime")]
+    pub expiration_time: u64,
+    #[serde(rename = "loanDate")]
+    pub loan_date: String,
+    #[serde(rename = "loanTerm")]
+    pub loan_term: String,
+}
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositHistoryQuery {

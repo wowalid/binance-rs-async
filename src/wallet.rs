@@ -143,7 +143,7 @@ impl Wallet {
             .await
     }
 
-    pub async fn get_loans(&self) -> Result<serde_json::Value> {
+    pub async fn get_loans(&self) -> Result<LoanResponse> {
         self.client
             .get_signed_p(SAPI_V1_ASSET_ONGOING_ORDERS, Option::<String>::None, self.recv_window)
             .await
