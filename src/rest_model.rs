@@ -1536,23 +1536,23 @@ pub struct CoinWithdrawalQuery {
     pub wallet_type: u8,
 }
 #[derive(Debug, Serialize, Deserialize)]
-struct LoanResponse {
-    rows: Vec<LoanInfo>,
-    total: u32,
+pub struct LoanResponse {
+    pub rows: Vec<LoanInfo>,
+    pub total: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct LoanInfo {
+pub struct LoanInfo {
     #[serde(rename = "loanCoin")]
-    loan_coin: String,
+    pub loan_coin: String,
     #[serde(rename = "totalDebt")]
-    total_debt: String,
+    pub total_debt: String,
     #[serde(rename = "collateralCoin")]
-    collateral_coin: String,
+    pub collateral_coin: String,
     #[serde(rename = "collateralAmount")]
-    collateral_amount: String,
+    pub collateral_amount: String,
     #[serde(rename = "currentLTV")]
-    current_ltv: String,
+    pub current_ltv: String,
 }
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
