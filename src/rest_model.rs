@@ -1535,39 +1535,24 @@ pub struct CoinWithdrawalQuery {
     /// The wallet type for withdraw，0: spot wallet. 1: funding wallet. Default:  spot wallet
     pub wallet_type: u8,
 }
-
 #[derive(Debug, Serialize, Deserialize)]
-pub struct LoanResponse {
+struct LoanResponse {
     rows: Vec<LoanInfo>,
     total: u32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct LoanInfo {
-    #[serde(rename = "orderId")]
-    pub order_id: u64,
+struct LoanInfo {
     #[serde(rename = "loanCoin")]
-    pub loan_coin: String,
+    loan_coin: String,
     #[serde(rename = "totalDebt")]
-    pub total_debt: String,
-    #[serde(rename = "residualInterest")]
-    pub residual_interest: String,
-    #[serde(rename = "collateralAccountId")]
-    pub collateral_account_id: String,
+    total_debt: String,
     #[serde(rename = "collateralCoin")]
-    pub collateral_coin: String,
-    #[serde(rename = "totalCollateralValueAfterHaircut")]
-    pub total_collateral_value_after_haircut: String,
-    #[serde(rename = "lockedCollateralValue")]
-    pub locked_collateral_value: String,
+    collateral_coin: String,
+    #[serde(rename = "collateralAmount")]
+    collateral_amount: String,
     #[serde(rename = "currentLTV")]
-    pub current_ltv: String,
-    #[serde(rename = "expirationTime")]
-    pub expiration_time: u64,
-    #[serde(rename = "loanDate")]
-    pub loan_date: String,
-    #[serde(rename = "loanTerm")]
-    pub loan_term: String,
+    current_ltv: String,
 }
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
