@@ -1796,18 +1796,10 @@ pub enum AdjustmentDirection {
 pub struct FlexibleLoanAdjustLTVResponse {
     pub loan_coin: String,
     pub collateral_coin: String,
-    pub direction: AdjustmentDirection,
+    pub direction: String,
     pub adjustment_amount: String,
     pub current_ltv: String,
-    pub status: AdjustmentStatus,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum AdjustmentStatus {
-    Succeeds,
-    Failed,
-    Processing,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
