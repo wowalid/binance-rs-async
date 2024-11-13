@@ -1797,7 +1797,7 @@ pub struct FlexibleLoanAdjustLTVResponse {
     pub loan_coin: String,
     pub collateral_coin: String,
     pub direction: String,
-    pub adjustment_amount: String,
+    pub amount: String,
     pub current_ltv: String,
     pub status: String,
 }

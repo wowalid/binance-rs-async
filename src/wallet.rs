@@ -314,7 +314,7 @@ impl Wallet {
         collateral_coin: String,
         adjustment_amount: f64,
         direction: AdjustmentDirection,
-    ) -> Result<serde_json::Value> {
+    ) -> Result<FlexibleLoanAdjustLTVResponse> {
         let adjust_ltv = FlexibleLoanAdjustLTV {
             loan_coin,
             collateral_coin,
