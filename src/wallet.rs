@@ -30,6 +30,8 @@ static SAPI_V1_ASSET_GETFUNDINGASSET: &str = "/sapi/v1/asset/get-funding-asset";
 static SAPI_V1_ASSET_APIRESTRICTIONS: &str = "/sapi/v1/account/apiRestrictions";
 static SAPI_V1_ASSET_ONGOING_ORDERS: &str = "/sapi/v2/loan/flexible/ongoing/orders";
 static SAPI_V1_VIP_LOAN_ONGOING_ORDERS: &str = "/sapi/v1/loan/vip/ongoing/orders";
+static SAPI_V2_LOAN_FLEXIBLE_ADJUST_LTV: &str = "/sapi/v2/loan/flexible/adjust/ltv";
+
 static DEFAULT_WALLET_HISTORY_QUERY_INTERVAL_DAYS: i64 = 90;
 
 /// This struct acts as a gateway for all wallet endpoints.
@@ -306,6 +308,24 @@ impl Wallet {
             .await
     }
 
+    pub async fn flexible_loan_adjust_ltv(
+        &self,
+        loan_coin: String,
+        collateral_coin: String,
+        adjustment_amount: f64,
+        direction: AdjustmentDirection,
+    ) -> Result<FlexibleLoanAdjustLTVResponse> {
+        let adjust_ltv = FlexibleLoanAdjustLTV {
+            loan_coin,
+            collateral_coin,
+            adjustment_amount,
+            direction,
+        };
+        self.client
+            .post_signed_p(SAPI_V2_LOAN_FLEXIBLE_ADJUST_LTV, adjust_ltv, self.recv_window)
+            .await
+    }
+
     /// Universal Transfer
     ///
     /// from_symbol must be sent when transfer_type are IsolatedmarginMargin and IsolatedmarginIsolatedmargin
@@ -318,6 +338,9 @@ impl Wallet {
     /// let records = tokio_test::block_on(wallet.universal_transfer("BTC".to_string(), 1.0, None, None, UniversalTransferType::FundingMain));
     /// assert!(records.is_ok(), "{:?}", records);
     /// ```
+    ///
+    ///
+    ///
     pub async fn universal_transfer(
         &self,
         asset: String,

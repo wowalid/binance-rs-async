@@ -1777,6 +1777,41 @@ pub struct UniversalTransfer {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct FlexibleLoanAdjustLTV {
+    pub loan_coin: String,
+    pub collateral_coin: String,
+    pub adjustment_amount: f64,
+    pub direction: AdjustmentDirection,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum AdjustmentDirection {
+    Additional,
+    Reduced,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FlexibleLoanAdjustLTVResponse {
+    pub loan_coin: String,
+    pub collateral_coin: String,
+    pub direction: AdjustmentDirection,
+    pub adjustment_amount: String,
+    pub current_ltv: String,
+    pub status: AdjustmentStatus,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum AdjustmentStatus {
+    Succeeds,
+    Failed,
+    Processing,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct DepositSubAccount {
     pub to_email: String,
     pub asset: String,
