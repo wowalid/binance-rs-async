@@ -29,6 +29,7 @@ static SAPI_V1_ASSET_TRANSFER: &str = "/sapi/v1/asset/transfer";
 static SAPI_V1_ASSET_GETFUNDINGASSET: &str = "/sapi/v1/asset/get-funding-asset";
 static SAPI_V1_ASSET_APIRESTRICTIONS: &str = "/sapi/v1/account/apiRestrictions";
 static SAPI_V1_ASSET_ONGOING_ORDERS: &str = "/sapi/v2/loan/flexible/ongoing/orders";
+static SAPI_V1_VIP_LOAN_ONGOING_ORDERS: &str = "/sapi/v1/loan/vip/ongoing/orders";
 static DEFAULT_WALLET_HISTORY_QUERY_INTERVAL_DAYS: i64 = 90;
 
 /// This struct acts as a gateway for all wallet endpoints.
@@ -146,6 +147,16 @@ impl Wallet {
     pub async fn get_loans(&self) -> Result<LoanResponse> {
         self.client
             .get_signed_p(SAPI_V1_ASSET_ONGOING_ORDERS, Option::<String>::None, self.recv_window)
+            .await
+    }
+
+    pub async fn get_vip_loans(&self) -> Result<VipLoanResponse> {
+        self.client
+            .get_signed_p(
+                SAPI_V1_VIP_LOAN_ONGOING_ORDERS,
+                Option::<String>::None,
+                self.recv_window,
+            )
             .await
     }
 
