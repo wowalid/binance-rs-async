@@ -243,6 +243,113 @@ pub struct Fill {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct DepositQuestionnaireRequest {
+    pub sub_account_id: String,
+    pub deposit_id: String,
+    pub questionnaire: UaeQuestionnaire,
+    pub beneficiary_pii: StandardPii,
+    pub network: Option<String>,
+    pub coin: Option<String>,
+    pub amount: Option<f64>,
+    pub address: Option<String>,
+    pub address_tag: Option<String>,
+    pub timestamp: u64,
+    pub signature: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct UaeQuestionnaire {
+    pub deposit_originator: i32, // 1: Myself, 2: Not myself
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_type: Option<i32>, // 0: Individual, 1: Corporate/Entity (required if depositOriginator is 2)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_name: Option<String>, // Required if depositOriginator is 2
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>, // Originator's nationality code, ISO 2 digit, lower case (required if depositOriginator is 2)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>, // Required if depositOriginator is 2
+    pub receive_from: i32, // 1: Private Wallet, 2: Another VASP
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp: Option<String>, // VASP CODE of the beneficiary (required if receiveFrom is 2)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp_name: Option<String>, // Required if vasp is "others"
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(tag = "piiType")]
+pub enum StandardPii {
+    #[serde(rename = "0")]
+    NaturalPerson(NaturalPersonPii),
+    #[serde(rename = "1")]
+    LegalPerson(LegalPersonPii),
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct NaturalPersonPii {
+    pub latin_names: Vec<PiiName>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub local_names: Option<Vec<PiiName>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nationality: Option<String>,
+    pub residence_country: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier_issue_country: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_of_birth: Option<String>, // Format: yyyy-mm-dd
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub place_of_birth: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct LegalPersonPii {
+    pub latin_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub local_name: Option<String>,
+    pub registration_country: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub national_identifier_issue_country: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub registration_date: Option<String>, // Format: yyyy-mm-dd
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub address: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wallet_address: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wallet_tag: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PiiName {
+    pub first_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub middle_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct DepositQuestionnaireResponse {
+    pub tr_id: u64,
+    pub accepted: bool,
+    pub info: String,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Transaction {
     pub symbol: String,
     pub order_id: u64,
@@ -1604,6 +1711,41 @@ pub struct DepositHistoryQuery {
     pub offset: Option<u64>,
 }
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct SubAccountDepositHistoryQuery {
+    pub sub_account_id: Option<String>,
+    pub coin: Option<String>,
+    pub status: Option<u16>, // 0: pending, 6: credited but cannot withdraw, 1: success
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub limit: Option<u32>,  // Default: 500
+    pub offset: Option<u32>, // Default: 0
+    pub recv_window: Option<u64>,
+    pub timestamp: u64, // Mandatory
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SubAccountDepositRecord {
+    pub deposit_id: u64,
+    pub sub_account_id: String,
+    pub address: String,
+    pub address_tag: String,
+    #[serde(with = "string_or_float")]
+    pub amount: f64,
+    pub coin: String,
+    pub insert_time: u64,
+    pub transfer_type: u8, // 0: external transfer, 1: internal transfer
+    pub network: String,
+    pub status: u8, // 0: pending, 6: credited but cannot withdraw, 1: success
+    pub tx_id: String,
+    pub source_address: String,
+    pub confirm_times: String,
+    pub self_return_status: u8, // 0: no self-return
+    pub travel_rule_status: u8, // 0: not required or info provided, 1: travel rule info required
+}
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositRecord {

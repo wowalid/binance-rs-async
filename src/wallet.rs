@@ -89,6 +89,86 @@ impl Wallet {
             .await
     }
 
+    /// Submit a deposit questionnaire for UAE Travel Rule compliance.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// use binance::{api::*, wallet::*, config::*, rest_model::*};
+    /// use chrono::Utc;
+    /// let wallet: Wallet = Binance::new_with_env(&Config::testnet());
+    /// let questionnaire = UaeQuestionnaire {
+    ///     deposit_originator: 1, // Myself
+    ///     org_type: None,
+    ///     org_name: None,
+    ///     country: None,
+    ///     city: None,
+    ///     receive_from: 1, // Private Wallet
+    ///     vasp: None,
+    ///     vasp_name: None,
+    /// };
+    /// let beneficiary_pii = StandardPii::NaturalPerson(NaturalPersonPii {
+    ///     latin_names: vec![PiiName {
+    ///         first_name: "John".to_string(),
+    ///         middle_name: None,
+    ///         last_name: Some("Doe".to_string()),
+    ///     }],
+    ///     local_names: None,
+    ///     nationality: Some("ae".to_string()),
+    ///     residence_country: "ae".to_string(),
+    ///     national_identifier: None,
+    ///     national_identifier_type: None,
+    ///     national_identifier_issue_country: None,
+    ///     date_of_birth: Some("1980-01-01".to_string()),
+    ///     place_of_birth: None,
+    ///     address: None,
+    /// });
+    /// let request = DepositQuestionnaireRequest {
+    ///     sub_account_id: "12345".to_string(),
+    ///     deposit_id: "67890".to_string(),
+    ///     questionnaire,
+    ///     beneficiary_pii,
+    ///     network: Some("ETH".to_string()),
+    ///     coin: Some("ETH".to_string()),
+    ///     amount: Some(1.5),
+    ///     address: Some("0x1234567890abcdef".to_string()),
+    ///     address_tag: None,
+    ///     timestamp: Utc::now().timestamp_millis() as u64,
+    ///     signature: "signature_here".to_string(), // Replace with actual signature
+    /// };
+    /// let response = tokio_test::block_on(wallet.submit_uae_deposit_questionnaire(request));
+    /// assert!(response.is_ok(), "{:?}", response);
+    /// ```
+    pub async fn submit_uae_deposit_questionnaire(
+        &self,
+        request: DepositQuestionnaireRequest,
+    ) -> Result<DepositQuestionnaireResponse> {
+        // URL-encode the questionnaire field to handle JSON formatting
+        let mut params = serde_urlencoded::to_string(&request)?;
+        if let Ok(encoded_questionnaire) = serde_json::to_string(&request.questionnaire) {
+            params = params.replace(
+                &format!("questionnaire={}", serde_urlencoded::to_string(&request.questionnaire)?),
+                &format!("questionnaire={}", urlencoding::encode(&encoded_questionnaire)),
+            );
+        }
+        if let Ok(encoded_pii) = serde_json::to_string(&request.beneficiary_pii) {
+            params = params.replace(
+                &format!(
+                    "beneficiaryPii={}",
+                    serde_urlencoded::to_string(&request.beneficiary_pii)?
+                ),
+                &format!("beneficiaryPii={}", urlencoding::encode(&encoded_pii)),
+            );
+        }
+
+        self.client
+            .put_signed_p(
+                "/sapi/v1/localentity/broker/deposit/provide-info",
+                params,
+                self.recv_window,
+            )
+            .await
+    }
+
     /// Disable Fast Withdraw Switch
     ///
     /// # Examples
@@ -159,6 +239,39 @@ impl Wallet {
                 Option::<String>::None,
                 self.recv_window,
             )
+            .await
+    }
+
+    /// Get sub-account deposit history.
+    ///
+    /// The query time period must be within the last 7 days. If `start_time` and `end_time` are not provided,
+    /// it defaults to the recent 7 days.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// use binance::{api::*, wallet::*, config::*, rest_model::*};
+    /// use chrono::Utc;
+    /// let wallet: Wallet = Binance::new_with_env(&Config::testnet());
+    /// let query = SubAccountDepositHistoryQuery {
+    ///     sub_account_id: Some("12345".to_string()),
+    ///     coin: Some("USDT".to_string()),
+    ///     status: Some(1), // Success
+    ///     start_time: None,
+    ///     end_time: None,
+    ///     limit: Some(500),
+    ///     offset: Some(0),
+    ///     recv_window: Some(5000),
+    ///     timestamp: Utc::now().timestamp_millis() as u64,
+    /// };
+    /// let response = tokio_test::block_on(wallet.get_sub_account_deposit_history(query));
+    /// assert!(response.is_ok(), "{:?}", response);
+    /// ```
+    pub async fn get_sub_account_deposit_history(
+        &self,
+        query: SubAccountDepositHistoryQuery,
+    ) -> Result<Vec<SubAccountDepositRecord>> {
+        self.client
+            .get_signed_p("/sapi/v1/broker/subAccount/depositHist", Some(query), self.recv_window)
             .await
     }
 
