@@ -91,11 +91,6 @@ async fn main() {
             println!("questionnaire {:?}", request);
             let response = wallet.submit_uae_deposit_questionnaire(request).await.unwrap();
             println!("Deposit ID: {:?}, requires questionnaire", response);
-            break;
         }
     }
-    println!(
-        "Binance Wallet: {:?}",
-        wallet.get_travel_rule_deposit_history(travel_rule_query).await
-    );
 }

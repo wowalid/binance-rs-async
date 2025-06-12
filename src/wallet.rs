@@ -149,7 +149,10 @@ impl Wallet {
         signature
     }
 
-    pub async fn submit_uae_deposit_questionnaire(&self, request: DepositQuestionnaireRequest) -> Result<String> {
+    pub async fn submit_uae_deposit_questionnaire(
+        &self,
+        request: DepositQuestionnaireRequest,
+    ) -> Result<DepositQuestionnaireResponse> {
         // Validate required questionnaire fields
         if request.questionnaire.deposit_originator == 0 || request.questionnaire.receive_from == 0 {
             return Err(Error::Msg(
@@ -170,11 +173,8 @@ impl Wallet {
 
         let endpoint = "/sapi/v1/localentity/deposit/provide-info";
         let recv_window = 15000; // Match provided URL
-        let response: serde_json::Value = self.client.put_signed_p(endpoint, payload, recv_window).await?;
 
-        println!("Response: {:?}", response);
-
-        Ok("".to_string())
+        self.client.put_signed_p(endpoint, payload, recv_window).await
     }
 
     /// Disable Fast Withdraw Switch
