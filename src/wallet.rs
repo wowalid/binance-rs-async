@@ -164,13 +164,12 @@ impl Wallet {
         let questionnaire_json = serde_json::to_string(&request.questionnaire)
             .map_err(|e| Error::Msg(format!("Failed to serialize questionnaire: {}", e)))?;
 
-        // Create payload with questionnaire as JSON string
-        let payload = serde_json::json!({
-            "tranId": request.tran_id,
-            "questionnaire": questionnaire_json,
-            "timestamp": request.timestamp,
-        });
-
+        // Construct payload manually to avoid serialization artifacts
+        let payload = vec![
+            ("tranId".to_string(), request.tran_id),
+            ("questionnaire".to_string(), questionnaire_json),
+            ("timestamp".to_string(), request.timestamp.to_string()),
+        ];
         let endpoint = "/sapi/v1/localentity/deposit/provide-info";
         let recv_window = 15000; // Match provided URL
 
