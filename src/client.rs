@@ -150,7 +150,7 @@ impl Client {
     ) -> Result<T> {
         let request = build_signed_request_p(payload, recv_window)?;
         let url = self.sign_request(endpoint, &request);
-
+        println!("PUT URL: {}", url);
         let response = self.inner.put(&url).headers(self.build_headers(true)?).send().await?;
 
         self.handler(response).await
