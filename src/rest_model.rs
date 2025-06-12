@@ -243,37 +243,29 @@ pub struct Fill {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct DepositQuestionnaireRequest {
-    pub sub_account_id: String,
-    pub deposit_id: String,
-    pub questionnaire: UaeQuestionnaire,
-    pub beneficiary_pii: StandardPii,
-    pub network: Option<String>,
-    pub coin: Option<String>,
-    pub amount: Option<f64>,
-    pub address: Option<String>,
-    pub address_tag: Option<String>,
-    pub timestamp: u64,
-    pub signature: String,
+pub struct UaeQuestionnaire {
+    pub deposit_originator: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_type: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub org_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    pub receive_from: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp_name: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct UaeQuestionnaire {
-    pub deposit_originator: i32, // 1: Myself, 2: Not myself
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub org_type: Option<i32>, // 0: Individual, 1: Corporate/Entity (required if depositOriginator is 2)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub org_name: Option<String>, // Required if depositOriginator is 2
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country: Option<String>, // Originator's nationality code, ISO 2 digit, lower case (required if depositOriginator is 2)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>, // Required if depositOriginator is 2
-    pub receive_from: i32, // 1: Private Wallet, 2: Another VASP
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub vasp: Option<String>, // VASP CODE of the beneficiary (required if receiveFrom is 2)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub vasp_name: Option<String>, // Required if vasp is "others"
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DepositQuestionnaireRequest {
+    pub tran_id: String,
+    #[serde(flatten)]
+    pub questionnaire: UaeQuestionnaire, // Flatten the nested struct
+    pub timestamp: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -1813,7 +1805,6 @@ pub struct WithdrawalRecord {
     pub tx_id: Option<String>,
 }
 
-#[cfg(feature = "wallet_api")]
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositAddressQuery {
@@ -1823,6 +1814,45 @@ pub struct DepositAddressQuery {
     pub network: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct TravelRuleDepositHistoryQuery {
+    pub tr_id: Option<String>,   // Comma-separated list of travel rule record IDs
+    pub tx_id: Option<String>,   // Comma-separated list of transaction IDs
+    pub tran_id: Option<String>, // Comma-separated list of wallet tran IDs
+    pub network: Option<String>,
+    pub coin: Option<String>,
+    pub travel_rule_status: Option<u8>,      // 0: Completed, 1: Pending, 2: Failed
+    pub pending_questionnaire: Option<bool>, // true: Only pending questionnaire records
+    pub start_time: Option<u64>,
+    pub end_time: Option<u64>,
+    pub offset: Option<u32>, // Default: 0
+    pub limit: Option<u32>,  // Default: 1000, Max: 1000
+    pub timestamp: u64,      // Mandatory
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct TravelRuleDepositRecord {
+    pub tr_id: u64,
+    pub tran_id: u64,
+    #[serde(with = "string_or_float")]
+    pub amount: f64,
+    pub coin: String,
+    pub network: String,
+    pub deposit_status: u8,
+    pub travel_rule_status: u8, // 0: Completed, 1: Pending, 2: Failed
+    pub address: String,
+    pub address_tag: String,
+    pub tx_id: String,
+    pub insert_time: u64,
+    pub transfer_type: u8, // 0: external transfer
+    pub confirm_times: Option<String>,
+    pub unlock_confirm: Option<u32>,
+    pub wallet_type: Option<u8>,
+    pub require_questionnaire: bool,
+    pub questionnaire: Option<serde_json::Value>, // JSON string or null
+}
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositAddress {

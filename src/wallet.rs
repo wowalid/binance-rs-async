@@ -3,6 +3,8 @@ use crate::errors::*;
 use crate::rest_model::*;
 use chrono::DateTime;
 use chrono::{Duration, Utc};
+use hex::encode as hex_encode;
+use ring::hmac;
 use std::collections::HashMap;
 use std::ops::Sub;
 
@@ -138,35 +140,41 @@ impl Wallet {
     /// let response = tokio_test::block_on(wallet.submit_uae_deposit_questionnaire(request));
     /// assert!(response.is_ok(), "{:?}", response);
     /// ```
-    pub async fn submit_uae_deposit_questionnaire(
-        &self,
-        request: DepositQuestionnaireRequest,
-    ) -> Result<DepositQuestionnaireResponse> {
-        // URL-encode the questionnaire field to handle JSON formatting
-        let mut params = serde_urlencoded::to_string(&request)?;
-        if let Ok(encoded_questionnaire) = serde_json::to_string(&request.questionnaire) {
-            params = params.replace(
-                &format!("questionnaire={}", serde_urlencoded::to_string(&request.questionnaire)?),
-                &format!("questionnaire={}", urlencoding::encode(&encoded_questionnaire)),
-            );
-        }
-        if let Ok(encoded_pii) = serde_json::to_string(&request.beneficiary_pii) {
-            params = params.replace(
-                &format!(
-                    "beneficiaryPii={}",
-                    serde_urlencoded::to_string(&request.beneficiary_pii)?
-                ),
-                &format!("beneficiaryPii={}", urlencoding::encode(&encoded_pii)),
-            );
+    ///
+    ///
+    ///
+    fn generate_signature(query_string: &str, api_secret: &str) -> String {
+        let mac = hmac::Key::new(hmac::HMAC_SHA256, api_secret.as_bytes());
+        let signature = hex_encode(hmac::sign(&mac, query_string.as_bytes()).as_ref());
+        signature
+    }
+
+    pub async fn submit_uae_deposit_questionnaire(&self, request: DepositQuestionnaireRequest) -> Result<String> {
+        // Validate required questionnaire fields
+        if request.questionnaire.deposit_originator == 0 || request.questionnaire.receive_from == 0 {
+            return Err(Error::Msg(
+                "Questionnaire must include depositOriginator and receiveFrom".to_string(),
+            ));
         }
 
-        self.client
-            .put_signed_p(
-                "/sapi/v1/localentity/broker/deposit/provide-info",
-                params,
-                self.recv_window,
-            )
-            .await
+        // Serialize UaeQuestionnaire to JSON string for questionnaire parameter
+        let questionnaire_json = serde_json::to_string(&request.questionnaire)
+            .map_err(|e| Error::Msg(format!("Failed to serialize questionnaire: {}", e)))?;
+
+        // Create payload with questionnaire as JSON string
+        let payload = serde_json::json!({
+            "tranId": request.tran_id,
+            "questionnaire": questionnaire_json,
+            "timestamp": request.timestamp,
+        });
+
+        let endpoint = "/sapi/v1/localentity/deposit/provide-info";
+        let recv_window = 15000; // Match provided URL
+        let response: serde_json::Value = self.client.put_signed_p(endpoint, payload, recv_window).await?;
+
+        println!("Response: {:?}", response);
+
+        Ok("".to_string())
     }
 
     /// Disable Fast Withdraw Switch
@@ -275,6 +283,14 @@ impl Wallet {
             .await
     }
 
+    pub async fn get_travel_rule_deposit_history(
+        &self,
+        query: TravelRuleDepositHistoryQuery,
+    ) -> Result<Vec<TravelRuleDepositRecord>> {
+        self.client
+            .get_signed_p("/sapi/v1/localentity/deposit/history", Some(query), self.recv_window)
+            .await
+    }
     /// Deposit History
     ///
     /// # Examples
