@@ -170,13 +170,11 @@ impl Wallet {
             #[serde(rename = "tranId")]
             tran_id: String,
             questionnaire: String,
-            timestamp: String,
         }
 
         let payload = QuestionnairePayload {
             tran_id: request.tran_id,
             questionnaire: questionnaire_json,
-            timestamp: request.timestamp.to_string(),
         };
 
         let endpoint = "/sapi/v1/localentity/deposit/provide-info";
