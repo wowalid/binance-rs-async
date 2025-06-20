@@ -1840,13 +1840,13 @@ pub struct TravelRuleDepositRecord {
     pub amount: f64,
     pub coin: String,
     pub network: String,
-    pub deposit_status: u8,
+    pub deposit_status: Option<u8>,
     pub travel_rule_status: u8, // 0: Completed, 1: Pending, 2: Failed
     pub address: String,
     pub address_tag: String,
     pub tx_id: String,
     pub insert_time: u64,
-    pub transfer_type: u8, // 0: external transfer
+    pub transfer_type: Option<u8>, // 0: external transfer
     pub confirm_times: Option<String>,
     pub unlock_confirm: Option<u32>,
     pub wallet_type: Option<u8>,
