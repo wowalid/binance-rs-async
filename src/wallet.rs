@@ -18,6 +18,7 @@ static SAPI_V1_CAPITAL_WITHDRAW_APPLY: &str = "/sapi/v1/capital/withdraw/apply";
 static SAPI_V1_CAPITAL_LOCAL_WITHDRAW_APPLY: &str = "/sapi/v1/localentity/withdraw/apply";
 static SAPI_V1_CAPITAL_DEPOSIT_HISREC: &str = "/sapi/v1/capital/deposit/hisrec";
 static SAPI_V1_CAPITAL_WITHDRAW_HISTORY: &str = "/sapi/v1/capital/withdraw/history";
+static SAPI_V1_CAPITAL_LOCAL_WITHDRAW_HISTORY: &str = "/sapi/v1/localentity/withdraw/history";
 static SAPI_V1_CAPITAL_DEPOSIT_ADDRESS: &str = "/sapi/v1/capital/deposit/address";
 static SAPI_V1_ACCOUNT_STATUS: &str = "/sapi/v1/account/status";
 static SAPI_V1_ACCOUNT_APITRADINGSTATUS: &str = "/sapi/v1/account/apiTradingStatus";
@@ -241,7 +242,7 @@ impl Wallet {
             .await
     }
 
-    pub async fn local_withdraw(&self, query: TravelRuleWithdrawQuery) -> Result<serde_json::Value> {
+    pub async fn local_withdraw(&self, query: TravelRuleWithdrawQuery) -> Result<TravelRuleResponseWitdhraw> {
         self.client
             .post_signed_p(SAPI_V1_CAPITAL_LOCAL_WITHDRAW_APPLY, Some(query), self.recv_window)
             .await
@@ -381,6 +382,15 @@ impl Wallet {
     pub async fn withdraw_history(&self, query: &WithdrawalHistoryQuery) -> Result<Vec<WithdrawalRecord>> {
         self.client
             .get_signed_p(SAPI_V1_CAPITAL_WITHDRAW_HISTORY, Some(query), self.recv_window)
+            .await
+    }
+
+    pub async fn withdraw_local_history(
+        &self,
+        query: &LocalWithdrawalHistoryQuery,
+    ) -> Result<Vec<LocalWithdrawalRecord>> {
+        self.client
+            .get_signed_p(SAPI_V1_CAPITAL_LOCAL_WITHDRAW_HISTORY, Some(query), self.recv_window)
             .await
     }
 

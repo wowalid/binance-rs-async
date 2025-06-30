@@ -1774,6 +1774,23 @@ pub struct WithdrawalHistoryQuery {
     pub offset: Option<u64>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalWithdrawalHistoryQuery {
+    pub coin: Option<String>,
+    pub withdraw_order_id: Option<String>,
+    /// 0(0:Email Sent,1:Cancelled 2:Awaiting Approval 3:Rejected 4:Processing 5:Failure 6:Completed)
+    pub status: Option<u16>,
+    /// Default: 90 days from current timestamp
+    pub start_time: Option<u64>,
+    /// Default: present timestamp
+    pub end_time: Option<u64>,
+    /// Default:1000, Max:1000
+    pub limit: Option<u64>,
+    /// Default: present timestamp
+    pub offset: Option<u64>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordHistory<T> {
@@ -1804,7 +1821,38 @@ pub struct WithdrawalRecord {
     pub info: Option<String>,
     pub tx_id: Option<String>,
 }
-
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct TravelRuleResponseWitdhraw {
+    pub accepted: Option<bool>,
+    pub info: Option<String>,
+    pub tr_id: Option<i64>,
+}
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalWithdrawalRecord {
+    pub id: Option<String>,
+    pub tr_id: Option<i64>,
+    #[serde(with = "string_or_float")]
+    pub amount: f64,
+    pub transaction_fee: Option<String>,
+    pub coin: Option<String>,
+    pub withdrawal_status: Option<i64>,
+    pub travel_rule_status: Option<i64>,
+    pub address: Option<String>,
+    pub address_tag: Option<String>,
+    pub tx_id: Option<String>,
+    pub apply_time: Option<serde_json::Value>,
+    pub network: Option<String>,
+    pub transfer_type: Option<i64>,
+    pub withdraw_order_id: Option<String>,
+    pub info: Option<String>,
+    pub confirm_no: Option<i64>,
+    pub wallet_type: Option<i64>,
+    pub tx_key: Option<String>,
+    pub questionnaire: Option<serde_json::Value>, // JSON string or null
+    pub complete_time: Option<serde_json::Value>,
+}
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DepositAddressQuery {
