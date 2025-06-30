@@ -1831,6 +1831,40 @@ pub struct TravelRuleDepositHistoryQuery {
     pub timestamp: u64,      // Mandatory
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct TravelRuleWithdrawQuery {
+    pub coin: String,
+    pub address: String,
+    pub amount: f64,
+    pub questionnaire: String, // JSON string or null
+    pub withdraw_order_id: Option<String>,
+    pub network: Option<String>,
+    pub address_tag: Option<String>,
+    pub transaction_fee_flag: Option<bool>,
+    pub name: Option<String>,
+    pub wallet_type: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct WithdrawQuestionnaire {
+    pub is_address_owner: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bnf_type: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bnf_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub city: Option<String>,
+    pub send_to: i32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vasp_name: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct TravelRuleDepositRecord {

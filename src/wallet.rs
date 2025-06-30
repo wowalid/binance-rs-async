@@ -15,6 +15,7 @@ static SAPI_V1_ACCOUNTSNAPSHOT: &str = "/sapi/v1/accountSnapshot";
 static SAPI_V1_ACCOUNT_DISABLEFASTWITHDRAWSWITCH: &str = "/sapi/v1/account/disableFastWithdrawSwitch";
 static SAPI_V1_ACCOUNT_ENABLEFASTWITHDRAWSWITCH: &str = "/sapi/v1/account/enableFastWithdrawSwitch";
 static SAPI_V1_CAPITAL_WITHDRAW_APPLY: &str = "/sapi/v1/capital/withdraw/apply";
+static SAPI_V1_CAPITAL_LOCAL_WITHDRAW_APPLY: &str = "/sapi/v1/localentity/withdraw/apply";
 static SAPI_V1_CAPITAL_DEPOSIT_HISREC: &str = "/sapi/v1/capital/deposit/hisrec";
 static SAPI_V1_CAPITAL_WITHDRAW_HISTORY: &str = "/sapi/v1/capital/withdraw/history";
 static SAPI_V1_CAPITAL_DEPOSIT_ADDRESS: &str = "/sapi/v1/capital/deposit/address";
@@ -240,6 +241,11 @@ impl Wallet {
             .await
     }
 
+    pub async fn local_withdraw(&self, query: TravelRuleWithdrawQuery) -> Result<serde_json::Value> {
+        self.client
+            .post_signed_p(SAPI_V1_CAPITAL_LOCAL_WITHDRAW_APPLY, Some(query), self.recv_window)
+            .await
+    }
     pub async fn get_loans(&self) -> Result<LoanResponse> {
         self.client
             .get_signed_p(SAPI_V1_ASSET_ONGOING_ORDERS, Option::<String>::None, self.recv_window)
